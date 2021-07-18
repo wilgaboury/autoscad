@@ -1,11 +1,11 @@
 // Global Constants
-$fn=25;
+$fn=50;
 
 side_len = 57;
-tolerance = 0.1;
+tolerance = 0.2;
 layer_outer_radius = 25;
 layer_width = 3;
-center_ring_diam = 32;
+center_ring_diam = 29.4;
 
 // Helper Contants
 center = [side_len / 2, side_len / 2, side_len / 2];
@@ -90,6 +90,7 @@ module CenterPiece() {
         translate([side_len/2, side_len/2, -1])
         union() {
             cylinder(screw_head_len+1, d=screw_head_diam);
+            translate([0, 0, screw_head_len])
             cylinder(screw_spring_len+1, d=screw_spring_diam);
             cylinder(side_len+1, d=screw_shaft_diam);
         }
@@ -99,7 +100,7 @@ module CenterPiece() {
 module EdgePiece() {
     module L1WeirdOval() {
         square_cross_axis_len = sqrt(2*side_len^2);
-        oval_x = center_ring_diam/2; // TODO: this is not correct
+        oval_x = center_ring_diam*0.53; // TODO: this is not correct
         oval_y = sqrt(2*((side_len-center_ring_diam)/2)^2)/2;
         yz_move_len = oval_y;
         yz_move_part = sqrt(yz_move_len^2/2);
@@ -162,6 +163,8 @@ module EdgePiece() {
 
 
 module CornerPiece() {
+    stem_width = 6;
+    
     union() {
         difference() {
             cube([side_len/3-tolerance/2,side_len/3-tolerance/2,side_len/3-tolerance/2]);
@@ -173,7 +176,7 @@ module CornerPiece() {
         difference() {
             translate([side_len/4, side_len/4, side_len/4])
             rotate([-atan(sqrt(2)), 0, -45])
-            cylinder(side_len/2, d=4);
+            cylinder(side_len/2, d=6);
             
             translate(center)
             sphere(layer_outer_radius-layer_width*2+tolerance/2);
@@ -199,4 +202,9 @@ module CornerPiece() {
 Core();
 CenterPiece();
 EdgePiece();
+//rotate_about_pt([45, 0, 0], center)
 CornerPiece();
+
+rotate_about_pt([-45, 0, 0], center)
+rotate_about_pt([0, 0, 90], center)
+EdgePiece();
