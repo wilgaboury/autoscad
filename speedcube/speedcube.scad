@@ -1,5 +1,5 @@
 // Global Constants
-$fn=50;
+$fn=25;
 
 side_len = 57;
 tolerance = 0.2;
@@ -176,7 +176,7 @@ module CornerPiece() {
         difference() {
             translate([side_len/4, side_len/4, side_len/4])
             rotate([-atan(sqrt(2)), 0, -45])
-            cylinder(side_len/2, d=6);
+            cylinder(side_len/2, d=stem_width);
             
             translate(center)
             sphere(layer_outer_radius-layer_width*2+tolerance/2);
@@ -202,9 +202,6 @@ module CornerPiece() {
 Core();
 CenterPiece();
 EdgePiece();
-//rotate_about_pt([45, 0, 0], center)
-CornerPiece();
 
-rotate_about_pt([-45, 0, 0], center)
-rotate_about_pt([0, 0, 90], center)
-EdgePiece();
+//rotate([45, -90+atan(sqrt(2)), 0])
+CornerPiece();
