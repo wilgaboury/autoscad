@@ -1,8 +1,8 @@
 // Global Constants
-$fn=25;
+$fn=24;
 
 side_len = 57;
-tolerance = 0.3;
+tolerance = 0.4;
 layer_outer_radius=25;
 layer_width = 3;
 center_ring_diam = 29.4;
@@ -39,7 +39,7 @@ module rotate_about_pt(rot, pt) {
 
 
 core_diameter = side_len/3;
-core_width = 10;
+core_width = 8;
 hole_diam = 2.5;
 module Core() {
     translate(center) {
@@ -62,33 +62,48 @@ module Core() {
     }
 }
 
+cap_height = 2;
+cap_lip_height = 2;
+cap_lip_diam = 15;
+cap_lip_width = 1;
+cap_lip_tol = 0.2;
+cap_top_tol = 0.2;
+cap_cutout_width = 3;
+cap_cutout_height = 1;
+cap_cutout_depth = 1.5;
+
 screw_shaft_diam = 3.5;
 screw_spring_diam = 5.5;
-screw_spring_len = 7.5;
+screw_spring_len = 4;
 screw_head_diam = 8;
-screw_head_len = 5;
+screw_head_len = 4;
 shaft_len = side_len/3 - tolerance;
-cap_height = 2;
-cap_cutout_width = 4;
-cap_cutout_height = 1;
-cap_cutout_depth = 1;
+shaft_diam = 10;
 
-module CenterCap(extend=false) {
+
+
+
+module CenterCap() {
+    translate([side_len/2, side_len/2, 0])
     
-    difference() {
-        translate([side_len/2, side_len/2, extend ? -1 : 0])
-        cylinder(extend ? cap_height+1 : cap_height, d=side_len/3-(extend ? 0 : tolerance));
-        
-        if (!extend) {
-            translate([side_len/2-cap_cutout_width/2, 2*side_len/3-cap_cutout_depth, cap_height-cap_cutout_height])
+    union() {
+        difference() {
+            cylinder(cap_height, d=side_len/3-tolerance);
+            
+            translate([-cap_cutout_width/2, side_len/6-cap_cutout_depth, cap_height-cap_cutout_height])
             cube([cap_cutout_width, side_len, cap_cutout_height+1]);
         }
-    }
-    
-    translate([side_len/2, side_len/2, 0])
-    difference() {
-        cylinder(2+cap_height, d=15);
-        cylinder(2+cap_height+1, d=13);
+        
+        difference() {
+            cylinder(cap_height+cap_lip_height-cap_lip_width/2, d=cap_lip_diam);
+            cylinder(cap_height+cap_lip_height+1, d=cap_lip_diam-cap_lip_width*2);
+        }
+        
+        translate([0,0,cap_height+cap_lip_height-cap_lip_width/2])
+        rotate_extrude(convexity=10)
+        translate([cap_lip_diam/2-cap_lip_width/2, 0, 0])
+        circle(cap_lip_width/2);
+        
     }
 }
 
@@ -108,18 +123,29 @@ module CenterPiece() {
                 sphere(layer_outer_radius - tolerance/2);
             }
             translate([side_len/2, side_len/2, 0])
-            cylinder(shaft_len, d=core_width);
+            cylinder(shaft_len, d=shaft_diam);
         }
         
-        translate([side_len/2, side_len/2, -1])
+        //Make hole through center
+        translate([side_len/2, side_len/2, cap_height])
         union() {
             cylinder(screw_head_len+1, d=screw_head_diam);
             translate([0, 0, screw_head_len])
             cylinder(screw_spring_len+1, d=screw_spring_diam);
             cylinder(side_len+1, d=screw_shaft_diam);
         }
+                
+        // Chamfer the top edge
+        difference() {
+            translate([0, 0, shaft_len+tolerance-shaft_diam/4])
+            cube(side_len);
+            
+            translate([side_len/2, side_len/2, shaft_len+tolerance/2-shaft_diam/4])
+            cylinder(shaft_diam/4, d1=shaft_diam+tolerance, d2=shaft_diam*3/4);
+        }
         
-        CenterCap(true);
+        translate([side_len/2, side_len/2, -1])
+        cylinder(cap_height+cap_top_tol+1, d=side_len/3);
     } 
 }
 
@@ -148,7 +174,7 @@ module EdgePiece() {
     }
     
     module InnerOval() {
-        oval_x = core_width/2;
+        oval_x = shaft_diam/2;
         oval_y = 12;
         
         translate([side_len/2, 0, 0])
@@ -178,20 +204,20 @@ module EdgePiece() {
             sub_oval_len = 15;
             
             difference() {
-                translate([0, side_len/2-sub_oval_len/2-core_width/2-tolerance, 0])
+                translate([0, side_len/2-sub_oval_len/2-shaft_diam/2-tolerance, 0])
                 cube([side_len, side_len, side_len/4]);
                 
-                translate([side_len/2, side_len/2-sub_oval_len/2-core_width/2-tolerance, 0])
-                oval(core_width/2, sub_oval_len/2, side_len);
+                translate([side_len/2, side_len/2-sub_oval_len/2-shaft_diam/2-tolerance, 0])
+                oval(shaft_diam/2, sub_oval_len/2, side_len);
             }
             
             difference() {
-                translate([0, 0, side_len/2-sub_oval_len/2-core_width/2-tolerance])
+                translate([0, 0, side_len/2-sub_oval_len/2-shaft_diam/2-tolerance])
                 cube([side_len, side_len/4, side_len]);
                 
-                translate([side_len/2, 0, side_len/2-sub_oval_len/2-core_width/2-tolerance])
+                translate([side_len/2, 0, side_len/2-sub_oval_len/2-shaft_diam/2-tolerance])
                 rotate([-90, 0, 0])
-                oval(core_width/2, sub_oval_len/2, side_len);
+                oval(shaft_diam/2, sub_oval_len/2, side_len);
             }
         }
         
@@ -230,13 +256,13 @@ module CornerPiece() {
         difference() {
             layer_hollow_sphere(2);
             
-            translate([side_len/2-core_width/2-tolerance, 0, 0])
+            translate([side_len/2-shaft_diam/2-tolerance, 0, 0])
             cube(side_len);
             
-            translate([0, side_len/2-core_width/2-tolerance, 0])
+            translate([0, side_len/2-shaft_diam/2-tolerance, 0])
             cube(side_len);
             
-            translate([0, 0, side_len/2-core_width/2-tolerance])
+            translate([0, 0, side_len/2-shaft_diam/2-tolerance])
             cube(side_len);
         }
         
@@ -256,7 +282,7 @@ EdgePiece();
 rotate_about_pt([0, 0, 90], center)
 EdgePiece();
 
-rotate_about_pt([30, 0, 0], center)
+rotate_about_pt([45, 0, 0], center)
 CornerPiece();
 
 rotate_about_pt([0,0,90], center)
