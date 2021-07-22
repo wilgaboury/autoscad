@@ -1,5 +1,5 @@
 // Global Constants
-$fn=24;
+$fn=100;
 
 side_len = 57;
 tolerance = 0.4;
@@ -272,21 +272,104 @@ module CornerPiece() {
     }
 }
 
+module FullCube() {
+    
+    union() {
+        CenterPiece();
+        CenterCap();
+        
+        CornerPiece();
+        rotate_about_pt([0,0,90], center)
+        CornerPiece();
+        rotate_about_pt([0,0,180], center)
+        CornerPiece();
+        rotate_about_pt([0,0,-90], center)
+        CornerPiece();
+        EdgePiece();
+        rotate_about_pt([0,0,90], center)
+        EdgePiece();
+        rotate_about_pt([0,0,180], center)
+        EdgePiece();
+        rotate_about_pt([0,0,-90], center)
+        EdgePiece();
+    }
+    
+    union() {
+        Core();
+    
+        rotate_about_pt([90,0,0], center) {
+            CenterPiece();
+            
+            translate([0,0,-25])
+            CenterCap();
+        }
+        rotate_about_pt([-90,0,0], center) {
+            CenterPiece();
+            CenterCap();
+        }
+        rotate_about_pt([0,90,0], center) {
+            CenterPiece();
+            CenterCap();
+        }
+        rotate_about_pt([0,-90,0], center) {
+            CenterPiece();
+            CenterCap();
+        }
+        
+        rotate_about_pt([0,90,0], center)
+        EdgePiece();
+        rotate_about_pt([0,90,90], center)
+        EdgePiece();
+        rotate_about_pt([0,90,180], center)
+        EdgePiece();
+        rotate_about_pt([0,90,-90], center)
+        EdgePiece();
+    }
+    
+    translate([0,0,40])
+    rotate_about_pt([0,0,30], center)
+    union() {
+        rotate_about_pt([180,0,0],center) {
+            CenterPiece();
+            CenterCap();
+        }
+        
+        rotate_about_pt([-90,0,0], center)
+        EdgePiece();
+        rotate_about_pt([-90,0,90], center)
+        EdgePiece();
+        rotate_about_pt([-90,0,180], center)
+        EdgePiece();
+        rotate_about_pt([-90,0,-90], center)
+        EdgePiece();
+        
+        rotate_about_pt([-90,0,0], center)
+        CornerPiece();
+        rotate_about_pt([-90,0,90], center)
+        CornerPiece();
+        rotate_about_pt([-90,0,180], center)
+        CornerPiece();
+        rotate_about_pt([-90,0,-90], center)
+        CornerPiece();
+    }
+}
 
-Core();
+FullCube();
 
-CenterPiece();
-
-translate([0,0,-10])
-CenterCap();
-
-EdgePiece();
-
-rotate_about_pt([0, 0, 90], center)
-EdgePiece();
-
-rotate_about_pt([30, 0, 0], center)
-CornerPiece();
-
-rotate_about_pt([0,0,90], center)
-CornerPiece();
+//Core();
+//
+//CenterPiece();
+//
+//translate([0,0,-10])
+//CenterCap();
+//
+//EdgePiece();
+//
+//rotate_about_pt([0, 0, 90], center)
+//EdgePiece();
+//
+//rotate_about_pt([30, 0, 0], center)
+//CornerPiece();
+//
+//rotate_about_pt([0,0,90], center)
+//CornerPiece();
