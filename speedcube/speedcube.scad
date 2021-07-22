@@ -61,6 +61,13 @@ module Core() {
         }
     }
 }
+screw_head_diam = 8;
+screw_head_len = 4;
+screw_spring_diam = 5.5;
+screw_spring_len = 4;
+screw_shaft_diam = 3.5;
+shaft_len = side_len/3 - tolerance;
+shaft_diam = 10;
 
 cap_height = 2;
 cap_lip_height = 2;
@@ -71,17 +78,6 @@ cap_top_tol = 0.2;
 cap_cutout_width = 3;
 cap_cutout_height = 1;
 cap_cutout_depth = 1.5;
-
-screw_shaft_diam = 3.5;
-screw_spring_diam = 5.5;
-screw_spring_len = 4;
-screw_head_diam = 8;
-screw_head_len = 4;
-shaft_len = side_len/3 - tolerance;
-shaft_diam = 10;
-
-
-
 
 module CenterCap() {
     translate([side_len/2, side_len/2, 0])
@@ -144,8 +140,15 @@ module CenterPiece() {
             cylinder(shaft_diam/4, d1=shaft_diam+tolerance, d2=shaft_diam*3/4);
         }
         
+        // make room for the cap
         translate([side_len/2, side_len/2, -1])
         cylinder(cap_height+cap_top_tol+1, d=side_len/3);
+        
+        translate([side_len/2, side_len/2, 0])
+        difference() {
+            cylinder(cap_height+cap_lip_height+cap_top_tol+cap_lip_tol, d=cap_lip_diam+cap_lip_tol*2);
+            cylinder(side_len, d=screw_head_diam+2);
+        }
     } 
 }
 
@@ -274,7 +277,7 @@ Core();
 
 CenterPiece();
 
-translate([0,0,-12])
+translate([0,0,-10])
 CenterCap();
 
 EdgePiece();
@@ -282,7 +285,7 @@ EdgePiece();
 rotate_about_pt([0, 0, 90], center)
 EdgePiece();
 
-rotate_about_pt([45, 0, 0], center)
+rotate_about_pt([30, 0, 0], center)
 CornerPiece();
 
 rotate_about_pt([0,0,90], center)
