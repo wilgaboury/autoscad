@@ -1,5 +1,5 @@
 // Global Constants
-$fn=100;
+$fn=24;
 
 side_len = 57;
 tolerance = 0.4;
@@ -354,22 +354,25 @@ module FullCube() {
     }
 }
 
-FullCube();
+module SomeCube() {
+    Core();
 
-//Core();
-//
-//CenterPiece();
-//
-//translate([0,0,-10])
-//CenterCap();
-//
-//EdgePiece();
-//
-//rotate_about_pt([0, 0, 90], center)
-//EdgePiece();
-//
-//rotate_about_pt([30, 0, 0], center)
-//CornerPiece();
-//
-//rotate_about_pt([0,0,90], center)
-//CornerPiece();
+    CenterPiece();
+
+    translate([0,0,-10])
+    CenterCap();
+
+    EdgePiece();
+
+    rotate_about_pt([0, 0, 90], center)
+    EdgePiece();
+
+    rotate_about_pt([30, 0, 0], center)
+    CornerPiece();
+
+    rotate_about_pt([0,0,90], center)
+    CornerPiece();
+}
+
+//FullCube();
+SomeCube();
